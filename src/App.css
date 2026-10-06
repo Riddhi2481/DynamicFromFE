@@ -1,0 +1,14 @@
+/* App level styling overrides */
+#root {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.pointer-events-none {
+  pointer-events: none;
+}
+
+.opacity-90 {
+  opacity: 0.9;
+}

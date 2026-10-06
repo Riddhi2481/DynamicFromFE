@@ -1,0 +1,39 @@
+/* Global Custom Design System Variables */
+:root {
+  --primary-color: #0d6efd;
+  --secondary-color: #6c757d;
+  --bg-canvas: #f8f9fa;
+  --border-radius-lg: 0.75rem;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: #f4f6f9;
+  color: #212529;
+  -webkit-font-smoothing: antialiased;
+}
+
+.border-dashed {
+  border: 2px dashed #dee2e6 !important;
+  border-radius: var(--border-radius-lg);
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.ring-primary {
+  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
+}
+
+.fs-7 {
+  font-size: 0.85rem !important;
+}
+
+.fs-8 {
+  font-size: 0.75rem !important;
+}
+
+.min-vh-25 {
+  min-height: 25vh;
+}

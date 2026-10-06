@@ -1,0 +1,23 @@
+export const OPERATORS = {
+  EQUALS: 'EQUALS',
+  NOT_EQUALS: 'NOT_EQUALS',
+  CONTAINS: 'CONTAINS',
+  GREATER_THAN: 'GREATER_THAN',
+  LESS_THAN: 'LESS_THAN',
+  GREATER_THAN_OR_EQUAL: 'GREATER_THAN_OR_EQUAL',
+  LESS_THAN_OR_EQUAL: 'LESS_THAN_OR_EQUAL',
+  IS_EMPTY: 'IS_EMPTY',
+  IS_NOT_EMPTY: 'IS_NOT_EMPTY'
+};
+
+export const OPERATOR_LABELS = {
+  [OPERATORS.EQUALS]: 'Equals (==)',
+  [OPERATORS.NOT_EQUALS]: 'Does Not Equal (!=)',
+  [OPERATORS.CONTAINS]: 'Contains Substring',
+  [OPERATORS.GREATER_THAN]: 'Greater Than (>)',
+  [OPERATORS.LESS_THAN]: 'Less Than (<)',
+  [OPERATORS.GREATER_THAN_OR_EQUAL]: 'Greater Than or Equal (>=)',
+  [OPERATORS.LESS_THAN_OR_EQUAL]: 'Less Than or Equal (<=)',
+  [OPERATORS.IS_EMPTY]: 'Is Empty',
+  [OPERATORS.IS_NOT_EMPTY]: 'Is Not Empty'
+};
