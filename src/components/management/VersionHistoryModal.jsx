@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import Modal from '../common/Modal';
 import StatusBadge from '../common/StatusBadge';
@@ -16,12 +15,11 @@ const VersionHistoryModal = ({ isOpen, onClose, form, onVersionChange }) => {
   const [selectedVersionSchema, setSelectedVersionSchema] = useState(null);
 
   const fetchVersions = useCallback(async () => {
-    const targetId = form?.id || form?._id || form?.formCode;
-    if (!targetId) return;
+    if (!form?.id) return;
     setLoading(true);
     setValidationError(null);
     try {
-      const data = await formApi.getVersions(targetId);
+      const data = await formApi.getVersions(form.id);
       setVersions(
         Array.isArray(data) && data.length > 0
           ? data
@@ -44,8 +42,7 @@ const VersionHistoryModal = ({ isOpen, onClose, form, onVersionChange }) => {
 
   // Create New Version Draft
   const handleCreateNewVersion = async () => {
-    const targetId = form?.id || form?._id || form?.formCode;
-    if (!targetId) return;
+    if (!form?.id) return;
     setLoading(true);
     setValidationError(null);
     try {
@@ -56,7 +53,7 @@ const VersionHistoryModal = ({ isOpen, onClose, form, onVersionChange }) => {
         status: 'DRAFT',
         createdAt: new Date().toISOString()
       };
-      await formApi.createVersion(targetId, payload);
+      await formApi.createVersion(form.id, payload);
       onVersionChange && onVersionChange();
       fetchVersions();
     } catch (err) {
@@ -70,10 +67,9 @@ const VersionHistoryModal = ({ isOpen, onClose, form, onVersionChange }) => {
 
   // Inspect Version Schema
   const handleViewVersion = async (verStr) => {
-    const targetId = form?.id || form?._id || form?.formCode;
     setLoading(true);
     try {
-      const schemaData = await formApi.getVersion(targetId, verStr);
+      const schemaData = await formApi.getVersion(form.id, verStr);
       setSelectedVersionSchema(schemaData || form);
     } catch {
       setSelectedVersionSchema(form);
@@ -84,13 +80,12 @@ const VersionHistoryModal = ({ isOpen, onClose, form, onVersionChange }) => {
 
   // Publish Version - Passes backend validation check
   const handlePublish = async (verStr) => {
-    const targetId = form?.id || form?._id || form?.formCode;
-    if (!targetId) return;
+    if (!form?.id) return;
     setPublishingVer(verStr);
     setValidationError(null);
     try {
       // Direct REST POST /api/forms/{id}/versions/{version}/publish
-      await formApi.publishVersion(targetId, verStr);
+      await formApi.publishVersion(form.id, verStr);
       setPublishingVer(null);
       onVersionChange && onVersionChange();
       fetchVersions();
