@@ -33,6 +33,10 @@ const FormListPage = () => {
   // Toast Notification
   const [toast, setToast] = useState(null);
 
+  // Loading states for actions
+  const [publishingId, setPublishingId] = useState(null);
+  const [archivingId, setArchivingId] = useState(null);
+
   const showToast = (title, message, type = 'success') => {
     setToast({ title, message, type });
     setTimeout(() => setToast(null), 4000);
@@ -57,6 +61,7 @@ const FormListPage = () => {
 
       const formsList = rawList.map((f) => ({
         ...f,
+        id: f.id || f._id || f.formCode || '',
         title: f.title || f.name || 'Untitled Form',
         formCode: f.formCode || f.code || '',
         version: f.version || f.currentDraftVersion || f.publishedVersion || '1',
@@ -75,27 +80,65 @@ const FormListPage = () => {
     loadForms();
   }, [loadForms]);
 
-  // Publish Action
+  // Publish Action - POST /api/forms/{id}/versions/{version}/publish
   const handlePublishForm = async (formItem) => {
+    const targetId = formItem?.id || formItem?._id || formItem?.formCode;
+    const targetVersion = formItem?.version || formItem?.currentDraftVersion || formItem?.publishedVersion || '1';
+
+    if (!targetId) {
+      showToast('Publish Error', 'Form ID is missing or invalid.', 'danger');
+      return;
+    }
+
+    if (publishingId || archivingId) return;
+
+    setPublishingId(targetId);
     try {
-      const updated = { ...formItem, status: 'PUBLISHED' };
-      await formApi.updateForm(formItem.id, updated);
+      await formApi.publishVersion(targetId, targetVersion);
+      setForms((prevForms) =>
+        prevForms.map((f) =>
+          (f.id === targetId || f.formCode === targetId)
+            ? { ...f, status: 'PUBLISHED', publishedVersion: targetVersion }
+            : f
+        )
+      );
       showToast('Form Published', `"${formItem.title}" is now published and active.`);
-      loadForms();
+      await loadForms();
     } catch (err) {
       showToast('Publish Error', err.message || 'Could not publish form.', 'danger');
+    } finally {
+      setPublishingId(null);
     }
   };
 
-  // Archive Action
+  // Archive Action - PUT /api/forms/{id} with status: 'ARCHIVED'
   const handleArchiveForm = async (formItem) => {
+    const targetId = formItem?.id || formItem?._id || formItem?.formCode;
+
+    if (!targetId) {
+      showToast('Archive Error', 'Form ID is missing or invalid.', 'danger');
+      return;
+    }
+
+    if (publishingId || archivingId) return;
+
+    setArchivingId(targetId);
     try {
       const updated = { ...formItem, status: 'ARCHIVED' };
-      await formApi.updateForm(formItem.id, updated);
+      await formApi.updateForm(targetId, updated);
+      setForms((prevForms) =>
+        prevForms.map((f) =>
+          (f.id === targetId || f.formCode === targetId)
+            ? { ...f, status: 'ARCHIVED' }
+            : f
+        )
+      );
       showToast('Form Archived', `"${formItem.title}" status set to ARCHIVED.`);
-      loadForms();
+      await loadForms();
     } catch (err) {
       showToast('Archive Error', err.message || 'Could not archive form.', 'danger');
+    } finally {
+      setArchivingId(null);
     }
   };
 
@@ -273,8 +316,13 @@ const FormListPage = () => {
                               className="btn btn-outline-success"
                               title="Publish Form"
                               onClick={() => handlePublishForm(f)}
+                              disabled={publishingId === (f.id || f.formCode) || archivingId === (f.id || f.formCode)}
                             >
-                              <i className="bi bi-cloud-upload"></i>
+                              {publishingId === (f.id || f.formCode) ? (
+                                <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                              ) : (
+                                <i className="bi bi-cloud-upload"></i>
+                              )}
                             </button>
                           )}
 
@@ -284,8 +332,13 @@ const FormListPage = () => {
                               className="btn btn-outline-warning"
                               title="Archive Form"
                               onClick={() => handleArchiveForm(f)}
+                              disabled={publishingId === (f.id || f.formCode) || archivingId === (f.id || f.formCode)}
                             >
-                              <i className="bi bi-archive"></i>
+                              {archivingId === (f.id || f.formCode) ? (
+                                <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                              ) : (
+                                <i className="bi bi-archive"></i>
+                              )}
                             </button>
                           )}
 
